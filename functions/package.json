@@ -1,0 +1,11 @@
+{
+  "name": "ns-vtc-portal-functions",
+  "private": true,
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc -p ."
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
