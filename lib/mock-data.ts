@@ -177,9 +177,33 @@ let applicationSeed: Application[] = [
   },
 ];
 
-const recruiterSeed: Recruiter[] = [
-  { id: "rec-1", name: "Ayesha Uwimana", role: "Senior Recruiter", email: "ayesha@nsvtc.rw", workload: 18, activeApplications: 11, placedCandidates: 4 },
-  { id: "rec-2", name: "Mpho Nkurunziza", role: "Recruiter", email: "mpho@nsvtc.rw", workload: 12, activeApplications: 8, placedCandidates: 2 },
+let recruiterSeed: Recruiter[] = [
+  {
+    id: "rec-1",
+    name: "Ayesha Uwimana",
+    role: "Senior Recruiter",
+    email: "ayesha@nsvtc.rw",
+    phone: "+250 788 100 001",
+    joinedAt: isoDaysAgo(180),
+    workload: 18,
+    activeApplications: 11,
+    placedCandidates: 4,
+    complaints: [
+      { id: "cmp-1", note: "Candidate reported delayed feedback after interview.", severity: "low", createdAt: isoDaysAgo(14), reportedBy: "Admin", resolved: true },
+    ],
+  },
+  {
+    id: "rec-2",
+    name: "Mpho Nkurunziza",
+    role: "Recruiter",
+    email: "mpho@nsvtc.rw",
+    phone: "+250 788 100 002",
+    joinedAt: isoDaysAgo(90),
+    workload: 12,
+    activeApplications: 8,
+    placedCandidates: 2,
+    complaints: [],
+  },
 ];
 
 const clone = <T,>(value: T): T =>
@@ -217,4 +241,23 @@ export const mockStore = {
   },
   listRecruiters: () => clone(recruiterSeed),
   getRecruiter: (recruiterId: string) => clone(recruiterSeed.find((r) => r.id === recruiterId)),
+  createRecruiter: (input: Omit<Recruiter, "id" | "joinedAt" | "workload" | "activeApplications" | "placedCandidates" | "complaints">) => {
+    const recruiter: Recruiter = { ...input, id: `rec-${recruiterSeed.length + 1}`, joinedAt: new Date().toISOString(), workload: 0, activeApplications: 0, placedCandidates: 0, complaints: [] };
+    recruiterSeed = [...recruiterSeed, recruiter];
+    return clone(recruiter);
+  },
+  addComplaint: (recruiterId: string, complaint: Omit<import("@/lib/types").Complaint, "id" | "createdAt" | "resolved">) => {
+    recruiterSeed = recruiterSeed.map((r) =>
+      r.id === recruiterId
+        ? { ...r, complaints: [{ ...complaint, id: `cmp-${Date.now()}`, createdAt: new Date().toISOString(), resolved: false }, ...r.complaints] }
+        : r,
+    );
+  },
+  resolveComplaint: (recruiterId: string, complaintId: string) => {
+    recruiterSeed = recruiterSeed.map((r) =>
+      r.id === recruiterId
+        ? { ...r, complaints: r.complaints.map((c) => c.id === complaintId ? { ...c, resolved: true } : c) }
+        : r,
+    );
+  },
 };

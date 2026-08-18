@@ -132,3 +132,81 @@ export async function getTradeBreakdown(): Promise<TradeRow[]> {
   }
   return [...map.values()].sort((a, b) => b.applications - a.applications);
 }
+
+export interface MonthlyPoint {
+  month: string; // e.g. "Jan", "Feb"
+  applications: number;
+  hired: number;
+}
+
+export interface ReportData {
+  stats: DashboardStats;
+  funnel: FunnelStep[];
+  trades: TradeRow[];
+  monthly: MonthlyPoint[];
+  conversionRate: number; // hired / total %
+  avgTimeToHire: number; // days (mock)
+  topTrade: string;
+}
+
+export async function getReportData(): Promise<ReportData> {
+  const applications = mockStore.listApplications();
+  const listings = mockStore.listListings();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const stats: DashboardStats = {
+    openListings: listings.filter((l) => l.status === "Open").length,
+    totalApplications: applications.length,
+    inPipeline: applications.filter((a) =>
+      (["Screening", "Under Review", "Shortlisted", "Interview"] as string[]).includes(a.stage),
+    ).length,
+    hired: applications.filter((a) => a.stage === "Hired").length,
+    overdueFollowUps: applications.filter((a) => {
+      if (!a.nextFollowUpDate) return false;
+      return new Date(a.nextFollowUpDate) < today;
+    }).length,
+  };
+
+  const funnel = await getFunnelData();
+  const trades = await getTradeBreakdown();
+
+  // Build last 6 months buckets
+  const monthly: MonthlyPoint[] = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(today.getFullYear(), today.getMonth() - (5 - i), 1);
+    return {
+      month: d.toLocaleString("default", { month: "short" }),
+      applications: 0,
+      hired: 0,
+    };
+  });
+
+  for (const app of applications) {
+    const d = new Date(app.appliedAt);
+    const monthIdx = monthly.findIndex(
+      (m) => m.month === d.toLocaleString("default", { month: "short" }),
+    );
+    if (monthIdx !== -1) {
+      monthly[monthIdx].applications++;
+      if (app.stage === "Hired") monthly[monthIdx].hired++;
+    }
+  }
+
+  const conversionRate =
+    stats.totalApplications > 0
+      ? Math.round((stats.hired / stats.totalApplications) * 100)
+      : 0;
+
+  const topTrade =
+    trades.length > 0 ? trades.sort((a, b) => b.applications - a.applications)[0].trade : "—";
+
+  return {
+    stats,
+    funnel,
+    trades,
+    monthly,
+    conversionRate,
+    avgTimeToHire: 18, // mock static value
+    topTrade,
+  };
+}

@@ -46,9 +46,9 @@ export function ActionCalendar({ events }: { events: CalendarEvent[] }) {
   return (
     <Card className="relative overflow-hidden">
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-base font-semibold">Action Calendar</h3>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <span className="text-sm text-slate">{monthName}</span>
           <button onClick={prev} className="rounded p-1 hover:bg-canvas"><ChevronLeft size={15} /></button>
           <button onClick={next} className="rounded p-1 hover:bg-canvas"><ChevronRight size={15} /></button>

@@ -12,8 +12,8 @@ export function FunnelChart({ steps }: { steps: FunnelStep[] }) {
       </div>
       <div className="space-y-3">
         {steps.map((step) => (
-          <div key={step.label} className="grid grid-cols-[100px_1fr_36px] items-center gap-3">
-            <span className="text-sm font-medium">{step.label}</span>
+          <div key={step.label} className="grid grid-cols-[80px_1fr_30px] items-center gap-2 sm:grid-cols-[100px_1fr_36px] sm:gap-3">
+            <span className="truncate text-sm font-medium">{step.label}</span>
             <div className="h-2.5 overflow-hidden rounded-full bg-border/60">
               <div
                 className="h-full rounded-full bg-navy transition-all"

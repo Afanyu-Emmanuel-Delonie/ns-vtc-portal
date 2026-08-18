@@ -43,7 +43,7 @@ export default async function ListingDetailPage({
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         {/* Left */}
         <div className="grid gap-6 self-start">
           {/* Description */}

@@ -137,7 +137,7 @@ export function ListingsBoard({ listings }: { listings: Listing[] }) {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-1 rounded-full border border-border bg-canvas p-1">
+          <div className="inline-flex flex-wrap items-center gap-1 rounded-full border border-border bg-canvas p-1">
             {statusFilters.map((option) => {
               const count = option === "All" ? listings.length : listings.filter((l) => l.status === option).length;
               const active = status === option;
