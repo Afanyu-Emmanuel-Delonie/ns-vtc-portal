@@ -40,7 +40,7 @@ export default async function ApplicationDetailPage({
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Left column */}
         <div className="grid gap-6 self-start">
           {/* Candidate info */}

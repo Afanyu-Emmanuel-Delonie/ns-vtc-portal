@@ -6,6 +6,7 @@ import { getListing } from "@/lib/queries/listings";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { BackButton } from "@/components/ui/BackButton";
+import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
 
 export default async function ListingDetailPage({
   params,
@@ -43,16 +44,20 @@ export default async function ListingDetailPage({
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         {/* Left */}
         <div className="grid gap-6 self-start">
-          {/* Description */}
           <Card>
             <h2 className="mb-3 text-base font-semibold">About this listing</h2>
             <p className="text-sm leading-7 text-slate">{listing.description}</p>
+            {listing.status === "Open" && (
+              <div className="mt-4 border-t border-border pt-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate">Apply link</p>
+                <CopyLinkButton path={`/apply/${listing.id}`} />
+              </div>
+            )}
           </Card>
 
-          {/* Applications */}
           <Card>
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-base font-semibold">Applications</h2>
@@ -80,64 +85,67 @@ export default async function ListingDetailPage({
           </Card>
         </div>
 
-        {/* Right — meta */}
-        <Card className="self-start">
-          <h2 className="mb-4 text-base font-semibold">Details</h2>
-          <dl className="grid gap-4">
-            <div className="flex items-start gap-2">
-              <MapPin size={15} className="mt-0.5 shrink-0 text-slate" />
-              <div>
-                <dt className="text-xs text-slate">Location</dt>
-                <dd className="text-sm font-medium">{listing.location}</dd>
+        {/* Right */}
+        <div className="grid gap-6 self-start">
+          <Card>
+            <h2 className="mb-4 text-base font-semibold">Details</h2>
+            <dl className="grid gap-4">
+              <div className="flex items-start gap-2">
+                <MapPin size={15} className="mt-0.5 shrink-0 text-slate" />
+                <div>
+                  <dt className="text-xs text-slate">Location</dt>
+                  <dd className="text-sm font-medium">{listing.location}</dd>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start gap-2">
-              <Building2 size={15} className="mt-0.5 shrink-0 text-slate" />
-              <div>
-                <dt className="text-xs text-slate">Employer</dt>
-                <dd className="text-sm font-medium">{listing.employer}</dd>
+              <div className="flex items-start gap-2">
+                <Building2 size={15} className="mt-0.5 shrink-0 text-slate" />
+                <div>
+                  <dt className="text-xs text-slate">Employer</dt>
+                  <dd className="text-sm font-medium">{listing.employer}</dd>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start gap-2">
-              <Briefcase size={15} className="mt-0.5 shrink-0 text-slate" />
-              <div>
-                <dt className="text-xs text-slate">Trade</dt>
-                <dd className="text-sm font-medium">{listing.trade}</dd>
+              <div className="flex items-start gap-2">
+                <Briefcase size={15} className="mt-0.5 shrink-0 text-slate" />
+                <div>
+                  <dt className="text-xs text-slate">Trade</dt>
+                  <dd className="text-sm font-medium">{listing.trade}</dd>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start gap-2">
-              <Users size={15} className="mt-0.5 shrink-0 text-slate" />
-              <div>
-                <dt className="text-xs text-slate">Salary</dt>
-                <dd className="text-sm font-medium">{listing.salary}</dd>
+              <div className="flex items-start gap-2">
+                <Users size={15} className="mt-0.5 shrink-0 text-slate" />
+                <div>
+                  <dt className="text-xs text-slate">Salary</dt>
+                  <dd className="text-sm font-medium">{listing.salary}</dd>
+                </div>
               </div>
-            </div>
-            {listing.applicationDeadline && (
+              {listing.applicationDeadline && (
+                <div className="flex items-start gap-2">
+                  <Calendar size={15} className="mt-0.5 shrink-0 text-slate" />
+                  <div>
+                    <dt className="text-xs text-slate">Deadline</dt>
+                    <dd className="text-sm font-medium">
+                      {new Date(listing.applicationDeadline).toLocaleDateString("en-RW", {
+                        day: "numeric", month: "short", year: "numeric",
+                      })}
+                    </dd>
+                  </div>
+                </div>
+              )}
               <div className="flex items-start gap-2">
                 <Calendar size={15} className="mt-0.5 shrink-0 text-slate" />
                 <div>
-                  <dt className="text-xs text-slate">Deadline</dt>
+                  <dt className="text-xs text-slate">Published</dt>
                   <dd className="text-sm font-medium">
-                    {new Date(listing.applicationDeadline).toLocaleDateString("en-RW", {
+                    {new Date(listing.publishedAt).toLocaleDateString("en-RW", {
                       day: "numeric", month: "short", year: "numeric",
                     })}
                   </dd>
                 </div>
               </div>
-            )}
-            <div className="flex items-start gap-2">
-              <Calendar size={15} className="mt-0.5 shrink-0 text-slate" />
-              <div>
-                <dt className="text-xs text-slate">Published</dt>
-                <dd className="text-sm font-medium">
-                  {new Date(listing.publishedAt).toLocaleDateString("en-RW", {
-                    day: "numeric", month: "short", year: "numeric",
-                  })}
-                </dd>
-              </div>
-            </div>
-          </dl>
-        </Card>
+            </dl>
+          </Card>
+
+        </div>
       </div>
     </div>
   );

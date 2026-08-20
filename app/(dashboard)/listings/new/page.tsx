@@ -1,38 +1,42 @@
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { redirect } from "next/navigation";
+import { BackButton } from "@/components/ui/BackButton";
+import { ListingForm } from "@/components/listings/ListingForm";
+import { createListing, getTrades, addTrade } from "@/lib/queries/listings";
+import { getEmployers } from "@/lib/queries/recruiters";
+import { defaultApplicationFields } from "@/lib/constants";
+import type { Listing } from "@/lib/types";
 
-export default function NewListingPage() {
+export default async function NewListingPage() {
+  const [trades, employers] = await Promise.all([getTrades(), getEmployers()]);
+
+  async function handleSave(data: Omit<Listing, "id" | "applicants" | "publishedAt">) {
+    "use server";
+    await createListing({
+      ...data,
+      applicationFields: data.applicationFields?.length
+        ? data.applicationFields
+        : defaultApplicationFields,
+    });
+    redirect("/listings");
+  }
+
+  async function handleAddTrade(trade: string) {
+    "use server";
+    await addTrade(trade);
+  }
+
   return (
-    <Card className="mx-auto max-w-3xl">
-      <div className="mb-6">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--slate)]">
-          Listings
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Create listing</h1>
+    <div className="grid gap-6">
+      <div>
+        <BackButton />
+        <div className="mt-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate">Listings</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight">Create listing</h1>
+        </div>
       </div>
-      <form className="grid gap-4">
-        <div className="grid gap-2 md:grid-cols-2">
-          <Input placeholder="Listing title" />
-          <Input placeholder="Trade" />
-        </div>
-        <div className="grid gap-2 md:grid-cols-2">
-          <Input placeholder="Employer" />
-          <Input placeholder="Location" />
-        </div>
-        <Input placeholder="Salary / stipend" />
-        <textarea
-          rows={6}
-          className="w-full rounded-2xl border border-[var(--border)] bg-surface px-4 py-3 text-sm outline-none"
-          placeholder="Description"
-        />
-        <div className="flex justify-end gap-3">
-          <Button variant="secondary" type="button">
-            Cancel
-          </Button>
-          <Button type="submit">Save listing</Button>
-        </div>
-      </form>
-    </Card>
+      <div className="mx-auto w-full max-w-3xl">
+        <ListingForm trades={trades} employers={employers} onSave={handleSave} onAddTrade={handleAddTrade} />
+      </div>
+    </div>
   );
 }

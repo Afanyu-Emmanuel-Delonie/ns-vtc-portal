@@ -6,7 +6,7 @@ import { DashboardShell } from "@/components/nav/DashboardShell";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get("ns_vtc_auth")?.value === "demo";
+  const isAuthenticated = Boolean(cookieStore.get("ns_vtc_auth")?.value);
 
   if (!isAuthenticated) {
     redirect("/login");

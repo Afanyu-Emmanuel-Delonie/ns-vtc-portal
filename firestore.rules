@@ -2,9 +2,35 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Public job listings — read for the public apply pages + dashboard SSR.
+    // Write is open because create/edit currently run via Next.js Server
+    // Actions with no Firebase Admin SDK wired up yet (no server-side auth
+    // context to check). Tighten this once Admin credentials are added.
+    match /listings/{listingId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Candidate applications — public read (dashboard SSR) and public create
+    // (candidate self-service submission, same as before). Updates/deletes
+    // (stage changes, follow-ups) require a signed-in staff session.
     match /applications/{applicationId} {
+      allow read: if true;
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+
+    // Employers — public read (dashboard SSR); writes happen client-side
+    // from the signed-in staff session, so they stay gated.
+    match /employers/{employerId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Lookup data (trade list, etc.) — same rationale as listings.
+    match /meta/{docId} {
+      allow read: if true;
+      allow write: if true;
     }
 
     match /{document=**} {

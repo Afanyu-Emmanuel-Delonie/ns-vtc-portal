@@ -29,7 +29,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* KPI strip */}
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-5">
         <KpiBox label="Open Listings" value={stats.openListings} />
         <KpiBox label="Total Applications" value={stats.totalApplications} />
         <KpiBox label="In Pipeline" value={stats.inPipeline} />
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Main two-column layout */}
-      <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         {/* Left — analytics */}
         <div className="grid gap-6">
           <FunnelChart steps={funnelSteps} />

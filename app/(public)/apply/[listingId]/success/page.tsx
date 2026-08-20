@@ -1,6 +1,5 @@
-import Link from "next/link";
+import { CheckCircle, Phone, Mail } from "lucide-react";
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
 
 export default async function ApplicationSuccessPage({
   searchParams,
@@ -10,25 +9,32 @@ export default async function ApplicationSuccessPage({
   const { candidate, listing } = await searchParams;
 
   return (
-    <Card className="mx-auto max-w-2xl text-center">
-      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--slate)]">
-        Application received
-      </p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-tight">
-        Thanks, {candidate || "candidate"}.
-      </h1>
-      <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[var(--slate)]">
-        We’ve logged the application{listing ? ` for ${listing}` : ""} and the recruitment
-        team can now review it in the dashboard.
-      </p>
-      <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <Button asChild>
-          <Link href="/">Back to dashboard</Link>
-        </Button>
-        <Button asChild variant="secondary">
-          <Link href="/login">Staff login</Link>
-        </Button>
-      </div>
-    </Card>
+    <div className="flex min-h-[80vh] items-center justify-center">
+      <Card className="mx-auto max-w-lg text-center">
+        <div className="flex justify-center">
+          <CheckCircle size={48} strokeWidth={1.5} className="text-emerald-500" />
+        </div>
+        <h1 className="mt-4 font-heading text-3xl font-bold tracking-tight">
+          Application submitted!
+        </h1>
+        <p className="mt-1 text-lg font-medium">
+          Thank you, {candidate || "candidate"}.
+        </p>
+        <p className="mx-auto mt-3 max-w-sm text-sm leading-7 text-slate">
+          Your application{listing ? ` for ${listing}` : ""} has been received. The recruitment team will be in touch if your profile is a good fit.
+        </p>
+        <div className="mx-auto mt-6 flex flex-col items-center gap-2 border-t border-border pt-6 text-sm text-slate">
+          <p className="font-medium text-ink">Have questions? Contact us:</p>
+          <a href="tel:+250788000000" className="flex items-center gap-1.5 hover:text-navy">
+            <Phone size={14} />
+            +250 788 000 000
+          </a>
+          <a href="mailto:info@nsvtc.co.za" className="flex items-center gap-1.5 hover:text-navy">
+            <Mail size={14} />
+            info@nsvtc.co.za
+          </a>
+        </div>
+      </Card>
+    </div>
   );
 }

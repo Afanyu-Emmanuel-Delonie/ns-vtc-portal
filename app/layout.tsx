@@ -16,6 +16,11 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "NS VTC Portal",
   description: "Recruitment portal for listings, applications, and reporting",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

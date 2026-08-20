@@ -1,5 +1,13 @@
 import type { PipelineStage } from "@/lib/constants";
 
+export interface ApplicationField {
+  key: string;
+  label: string;
+  required: boolean;
+  enabled: boolean;
+  type: "text" | "textarea" | "file" | "url";
+}
+
 export interface Listing {
   id: string;
   title: string;
@@ -12,6 +20,8 @@ export interface Listing {
   applicants: number;
   publishedAt: string;
   applicationDeadline?: string;
+  applicationFields: ApplicationField[];
+  employerId?: string;
 }
 
 export interface FollowUp {
@@ -48,16 +58,16 @@ export interface Complaint {
   resolved: boolean;
 }
 
-export interface Recruiter {
+export interface Employer {
   id: string;
   name: string;
-  role: string;
+  industry: string;
   email: string;
   phone?: string;
+  location: string;
   joinedAt: string;
-  workload: number;
-  activeApplications: number;
-  placedCandidates: number;
+  activeListings: number;
+  totalPlacements: number;
   complaints: Complaint[];
 }
 
