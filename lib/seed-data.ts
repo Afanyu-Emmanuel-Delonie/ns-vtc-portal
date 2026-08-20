@@ -153,6 +153,7 @@ export const applicationSeed: Application[] = [
     recruiter: "Mpho Ndlovu",
     notes: "Accepted offer. Starting next month.",
     appliedAt: isoDaysAgo(20),
+    hiredAt: isoDaysAgo(3),
     followUps: [],
   },
   {

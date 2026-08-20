@@ -105,7 +105,7 @@ export default async function ApplicationDetailPage({
           {/* Stage */}
           <Card>
             <h2 className="mb-4 text-base font-semibold">Pipeline stage</h2>
-            <StageSelector initialStage={application.stage} />
+            <StageSelector applicationId={application.id} initialStage={application.stage} />
           </Card>
 
           {/* Notes */}

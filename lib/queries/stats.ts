@@ -146,7 +146,7 @@ export interface ReportData {
   trades: TradeRow[];
   monthly: MonthlyPoint[];
   conversionRate: number; // hired / total %
-  avgTimeToHire: number; // days (mock)
+  avgTimeToHire: number; // avg days from appliedAt to hiredAt, across hired applications
   topTrade: string;
 }
 
@@ -201,13 +201,22 @@ export async function getReportData(): Promise<ReportData> {
   const topTrade =
     trades.length > 0 ? trades.sort((a, b) => b.applications - a.applications)[0].trade : "—";
 
+  const hireDurations = applications
+    .filter((a) => a.hiredAt)
+    .map((a) => (new Date(a.hiredAt!).getTime() - new Date(a.appliedAt).getTime()) / 86400000)
+    .filter((days) => days >= 0);
+  const avgTimeToHire =
+    hireDurations.length > 0
+      ? Math.round(hireDurations.reduce((sum, d) => sum + d, 0) / hireDurations.length)
+      : 0;
+
   return {
     stats,
     funnel,
     trades,
     monthly,
     conversionRate,
-    avgTimeToHire: 18, // mock static value
+    avgTimeToHire,
     topTrade,
   };
 }

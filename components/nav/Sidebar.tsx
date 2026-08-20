@@ -95,7 +95,7 @@ export function Sidebar() {
         <button
           title={!isMobile && collapsed ? "Sign out" : undefined}
           onClick={signOut}
-          className={`font-heading flex w-full items-center rounded-xl py-2.5 text-sm font-semibold text-white/60 transition hover:bg-white/10 hover:text-white ${
+          className={`font-heading flex w-full items-center border border-white/20 rounded-full py-2.5 text-sm font-semibold text-white/60 transition hover:bg-white/10 hover:text-white ${
             !isMobile && collapsed ? "justify-center px-0" : "gap-3 px-3"
           }`}
         >

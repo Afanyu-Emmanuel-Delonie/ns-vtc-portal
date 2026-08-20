@@ -38,7 +38,12 @@ export async function getApplication(applicationId: string): Promise<Application
 }
 
 export async function updateStage(applicationId: string, stage: PipelineStage): Promise<void> {
-  await updateDoc(doc(requireDb(), "applications", applicationId), { stage });
+  const ref = doc(requireDb(), "applications", applicationId);
+  if (stage === "Hired") {
+    await updateDoc(ref, { stage, hiredAt: new Date().toISOString() });
+  } else {
+    await updateDoc(ref, { stage });
+  }
 }
 
 export async function addFollowUp(
