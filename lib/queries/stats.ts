@@ -1,11 +1,12 @@
 import type { DashboardStats } from "@/lib/types";
-import { mockStore } from "@/lib/mock-data";
+import { getListings } from "@/lib/queries/listings";
+import { getApplications } from "@/lib/queries/applications";
 
 const PIPELINE_STAGES = ["Screening", "Under Review", "Shortlisted", "Interview"] as const;
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  const listings = mockStore.listListings();
-  const applications = mockStore.listApplications();
+  const listings = await getListings();
+  const applications = await getApplications();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -31,8 +32,8 @@ export interface CalendarEvent {
 }
 
 export async function getCalendarEvents(): Promise<CalendarEvent[]> {
-  const applications = mockStore.listApplications();
-  const listings = mockStore.listListings();
+  const applications = await getApplications();
+  const listings = await getListings();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const in7 = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -88,7 +89,7 @@ export interface DeadlineListing {
 }
 
 export async function getUpcomingDeadlines(): Promise<DeadlineListing[]> {
-  const listings = mockStore.listListings();
+  const listings = await getListings();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const in14 = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
@@ -110,7 +111,7 @@ export interface FunnelStep {
 }
 
 export async function getFunnelData(): Promise<FunnelStep[]> {
-  const applications = mockStore.listApplications();
+  const applications = await getApplications();
   const stages = ["New", "Screening", "Under Review", "Shortlisted", "Interview", "Offer", "Hired"];
   return stages.map((s) => ({ label: s, value: applications.filter((a) => a.stage === s).length }));
 }
@@ -122,7 +123,7 @@ export interface TradeRow {
 }
 
 export async function getTradeBreakdown(): Promise<TradeRow[]> {
-  const applications = mockStore.listApplications();
+  const applications = await getApplications();
   const map = new Map<string, TradeRow>();
   for (const a of applications) {
     const row = map.get(a.trade) ?? { trade: a.trade, applications: 0, hired: 0 };
@@ -150,8 +151,8 @@ export interface ReportData {
 }
 
 export async function getReportData(): Promise<ReportData> {
-  const applications = mockStore.listApplications();
-  const listings = mockStore.listListings();
+  const applications = await getApplications();
+  const listings = await getListings();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 

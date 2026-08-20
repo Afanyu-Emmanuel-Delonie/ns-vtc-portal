@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AlertTriangle, CheckCircle, Plus, X } from "lucide-react";
 import type { Complaint } from "@/lib/types";
-import { mockStore } from "@/lib/mock-data";
+import { addComplaint, resolveComplaint } from "@/lib/queries/recruiters";
 import { useRouter } from "next/navigation";
 
 const SEVERITY_STYLES: Record<Complaint["severity"], string> = {
@@ -24,7 +24,7 @@ export function ComplaintsPanel({
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ note: "", severity: "low" as Complaint["severity"], reportedBy: "" });
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.note.trim()) return;
     const newComplaint: Complaint = {
@@ -35,15 +35,15 @@ export function ComplaintsPanel({
       createdAt: new Date().toISOString(),
       resolved: false,
     };
-    mockStore.addComplaint(recruiterId, { note: newComplaint.note, severity: newComplaint.severity, reportedBy: newComplaint.reportedBy });
+    await addComplaint(recruiterId, { note: newComplaint.note, severity: newComplaint.severity, reportedBy: newComplaint.reportedBy });
     setComplaints([newComplaint, ...complaints]);
     setForm({ note: "", severity: "low", reportedBy: "" });
     setAdding(false);
     router.refresh();
   };
 
-  const handleResolve = (id: string) => {
-    mockStore.resolveComplaint(recruiterId, id);
+  const handleResolve = async (id: string) => {
+    await resolveComplaint(recruiterId, id);
     setComplaints((prev) => prev.map((c) => c.id === id ? { ...c, resolved: true } : c));
     router.refresh();
   };

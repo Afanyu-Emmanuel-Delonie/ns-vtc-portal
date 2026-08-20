@@ -14,13 +14,15 @@ import {
   LogOut,
   type LucideIcon,
 } from "lucide-react";
+import { signOut as firebaseSignOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { useSidebar } from "./SidebarContext";
 
 const links: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/listings", label: "Listings", icon: Briefcase },
   { href: "/applications", label: "Applications", icon: FileText },
-  { href: "/recruiters", label: "Recruiters", icon: Users },
+  { href: "/recruiters", label: "Employers", icon: Users },
   { href: "/reports", label: "Reports", icon: BarChart2 },
   { href: "/settings", label: "Profile", icon: UserCircle },
 ];
@@ -30,7 +32,10 @@ export function Sidebar() {
   const router = useRouter();
   const { collapsed, toggle, mobileOpen, closeMobile } = useSidebar();
 
-  function signOut() {
+  async function signOut() {
+    if (auth) {
+      await firebaseSignOut(auth).catch(() => {});
+    }
     document.cookie = "ns_vtc_auth=; Max-Age=0; path=/";
     router.push("/login");
   }

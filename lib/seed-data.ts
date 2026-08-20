@@ -1,24 +1,26 @@
-import type { Application, Listing, Recruiter } from "@/lib/types";
-import { pipelineStages } from "@/lib/constants";
+import type { Application, Employer, Listing } from "@/lib/types";
+import { defaultApplicationFields } from "@/lib/constants";
 
 const now = new Date();
 const iso = (days: number) =>
   new Date(now.getTime() + days * 24 * 60 * 60 * 1000).toISOString();
 const isoDaysAgo = (days: number) => iso(-days);
 
-let listingSeed: Listing[] = [
+export const listingSeed: Listing[] = [
   {
     id: "lst-1001",
     title: "Senior Welder Apprentice Intake",
     trade: "Welder",
     location: "Kigali, Gasabo",
     employer: "Kigali Steel & Fabrication",
+    employerId: "emp-1",
     status: "Open",
     description: "Training pathway for motivated candidates who want hands-on workshop experience.",
     salary: "RWF 75,000 stipend",
     applicants: 14,
     publishedAt: isoDaysAgo(8),
     applicationDeadline: iso(5),
+    applicationFields: defaultApplicationFields.map((f) => ({ ...f })),
   },
   {
     id: "lst-1002",
@@ -26,12 +28,14 @@ let listingSeed: Listing[] = [
     trade: "Electrician",
     location: "Musanze, Northern Province",
     employer: "RwandaPower Solutions",
+    employerId: "emp-2",
     status: "Open",
     description: "Campus-linked placement with rotating site visits and a strong mentorship plan.",
     salary: "RWF 82,500 stipend",
     applicants: 9,
     publishedAt: isoDaysAgo(4),
     applicationDeadline: iso(10),
+    applicationFields: defaultApplicationFields.map((f) => ({ ...f })),
   },
   {
     id: "lst-1003",
@@ -39,12 +43,14 @@ let listingSeed: Listing[] = [
     trade: "Plumber",
     location: "Huye, Southern Province",
     employer: "AquaTech Rwanda",
+    employerId: "emp-3",
     status: "Paused",
     description: "Mid-size commercial maintenance role with exposure to water systems and fittings.",
     salary: "RWF 91,000 stipend",
     applicants: 6,
     publishedAt: isoDaysAgo(13),
     applicationDeadline: iso(3),
+    applicationFields: defaultApplicationFields.map((f) => ({ ...f })),
   },
   {
     id: "lst-1004",
@@ -52,16 +58,18 @@ let listingSeed: Listing[] = [
     trade: "Boilermaker",
     location: "Rubavu, Western Province",
     employer: "Great Lakes Industrial",
+    employerId: "emp-4",
     status: "Open",
     description: "Hands-on boilermaking learnership with RTQF-aligned accreditation.",
     salary: "RWF 80,000 stipend",
     applicants: 4,
     publishedAt: isoDaysAgo(2),
     applicationDeadline: iso(12),
+    applicationFields: defaultApplicationFields.map((f) => ({ ...f })),
   },
 ];
 
-let applicationSeed: Application[] = [
+export const applicationSeed: Application[] = [
   {
     id: "app-2001",
     listingId: "lst-1001",
@@ -177,87 +185,55 @@ let applicationSeed: Application[] = [
   },
 ];
 
-let recruiterSeed: Recruiter[] = [
+export const employerSeed: Employer[] = [
   {
-    id: "rec-1",
-    name: "Ayesha Uwimana",
-    role: "Senior Recruiter",
-    email: "ayesha@nsvtc.rw",
-    phone: "+250 788 100 001",
+    id: "emp-1",
+    name: "Kigali Steel & Fabrication",
+    industry: "Manufacturing",
+    email: "hr@kigalisteel.rw",
+    phone: "+250 788 200 001",
+    location: "Kigali, Gasabo",
     joinedAt: isoDaysAgo(180),
-    workload: 18,
-    activeApplications: 11,
-    placedCandidates: 4,
+    activeListings: 1,
+    totalPlacements: 4,
     complaints: [
       { id: "cmp-1", note: "Candidate reported delayed feedback after interview.", severity: "low", createdAt: isoDaysAgo(14), reportedBy: "Admin", resolved: true },
     ],
   },
   {
-    id: "rec-2",
-    name: "Mpho Nkurunziza",
-    role: "Recruiter",
-    email: "mpho@nsvtc.rw",
-    phone: "+250 788 100 002",
+    id: "emp-2",
+    name: "RwandaPower Solutions",
+    industry: "Electrical",
+    email: "hr@rwandapower.rw",
+    phone: "+250 788 200 002",
+    location: "Musanze, Northern Province",
+    joinedAt: isoDaysAgo(120),
+    activeListings: 1,
+    totalPlacements: 2,
+    complaints: [],
+  },
+  {
+    id: "emp-3",
+    name: "AquaTech Rwanda",
+    industry: "Plumbing & Water Systems",
+    email: "hr@aquatech.rw",
+    phone: "+250 788 200 003",
+    location: "Huye, Southern Province",
     joinedAt: isoDaysAgo(90),
-    workload: 12,
-    activeApplications: 8,
-    placedCandidates: 2,
+    activeListings: 0,
+    totalPlacements: 1,
+    complaints: [],
+  },
+  {
+    id: "emp-4",
+    name: "Great Lakes Industrial",
+    industry: "Industrial",
+    email: "hr@greatlakesindustrial.rw",
+    phone: "+250 788 200 004",
+    location: "Rubavu, Western Province",
+    joinedAt: isoDaysAgo(60),
+    activeListings: 1,
+    totalPlacements: 0,
     complaints: [],
   },
 ];
-
-const clone = <T,>(value: T): T =>
-  (value === undefined ? value : (JSON.parse(JSON.stringify(value)) as T));
-
-export const mockStore = {
-  pipelineStages,
-  listListings: () => clone(listingSeed),
-  getListing: (listingId: string) => clone(listingSeed.find((l) => l.id === listingId)),
-  createListing: (input: Omit<Listing, "id" | "applicants" | "publishedAt">) => {
-    const listing: Listing = { ...input, id: `lst-${listingSeed.length + 1001}`, applicants: 0, publishedAt: new Date().toISOString() };
-    listingSeed = [listing, ...listingSeed];
-    return clone(listing);
-  },
-  closeListing: (listingId: string) => {
-    listingSeed = listingSeed.map((l) => l.id === listingId ? { ...l, status: "Closed" } : l);
-  },
-  listApplications: () => clone(applicationSeed),
-  getApplication: (applicationId: string) => clone(applicationSeed.find((a) => a.id === applicationId)),
-  createApplication: (input: Omit<Application, "id" | "appliedAt" | "followUps" | "stage"> & { listingId: string }) => {
-    const application: Application = { ...input, id: `app-${applicationSeed.length + 2001}`, stage: "New", appliedAt: new Date().toISOString(), followUps: [] };
-    applicationSeed = [application, ...applicationSeed];
-    listingSeed = listingSeed.map((l) => l.id === application.listingId ? { ...l, applicants: l.applicants + 1 } : l);
-    return clone(application);
-  },
-  updateStage: (applicationId: string, stage: (typeof pipelineStages)[number]) => {
-    applicationSeed = applicationSeed.map((a) => a.id === applicationId ? { ...a, stage } : a);
-  },
-  addFollowUp: (applicationId: string, note: string, recruiter: string, type: import("@/lib/types").FollowUp["type"]) => {
-    applicationSeed = applicationSeed.map((a) =>
-      a.id === applicationId
-        ? { ...a, followUps: [{ id: `fu-${Date.now()}`, note, recruiter, type, createdAt: new Date().toISOString() }, ...a.followUps] }
-        : a,
-    );
-  },
-  listRecruiters: () => clone(recruiterSeed),
-  getRecruiter: (recruiterId: string) => clone(recruiterSeed.find((r) => r.id === recruiterId)),
-  createRecruiter: (input: Omit<Recruiter, "id" | "joinedAt" | "workload" | "activeApplications" | "placedCandidates" | "complaints">) => {
-    const recruiter: Recruiter = { ...input, id: `rec-${recruiterSeed.length + 1}`, joinedAt: new Date().toISOString(), workload: 0, activeApplications: 0, placedCandidates: 0, complaints: [] };
-    recruiterSeed = [...recruiterSeed, recruiter];
-    return clone(recruiter);
-  },
-  addComplaint: (recruiterId: string, complaint: Omit<import("@/lib/types").Complaint, "id" | "createdAt" | "resolved">) => {
-    recruiterSeed = recruiterSeed.map((r) =>
-      r.id === recruiterId
-        ? { ...r, complaints: [{ ...complaint, id: `cmp-${Date.now()}`, createdAt: new Date().toISOString(), resolved: false }, ...r.complaints] }
-        : r,
-    );
-  },
-  resolveComplaint: (recruiterId: string, complaintId: string) => {
-    recruiterSeed = recruiterSeed.map((r) =>
-      r.id === recruiterId
-        ? { ...r, complaints: r.complaints.map((c) => c.id === complaintId ? { ...c, resolved: true } : c) }
-        : r,
-    );
-  },
-};

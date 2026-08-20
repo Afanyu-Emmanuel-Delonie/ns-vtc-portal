@@ -1,9 +1,30 @@
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { redirect } from "next/navigation";
 import { BackButton } from "@/components/ui/BackButton";
+import { ListingForm } from "@/components/listings/ListingForm";
+import { createListing, getTrades, addTrade } from "@/lib/queries/listings";
+import { getEmployers } from "@/lib/queries/recruiters";
+import { defaultApplicationFields } from "@/lib/constants";
+import type { Listing } from "@/lib/types";
 
-export default function NewListingPage() {
+export default async function NewListingPage() {
+  const [trades, employers] = await Promise.all([getTrades(), getEmployers()]);
+
+  async function handleSave(data: Omit<Listing, "id" | "applicants" | "publishedAt">) {
+    "use server";
+    await createListing({
+      ...data,
+      applicationFields: data.applicationFields?.length
+        ? data.applicationFields
+        : defaultApplicationFields,
+    });
+    redirect("/listings");
+  }
+
+  async function handleAddTrade(trade: string) {
+    "use server";
+    await addTrade(trade);
+  }
+
   return (
     <div className="grid gap-6">
       <div>
@@ -13,28 +34,9 @@ export default function NewListingPage() {
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">Create listing</h1>
         </div>
       </div>
-      <Card className="max-w-3xl">
-        <form className="grid gap-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Input placeholder="Listing title" />
-            <Input placeholder="Trade" />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Input placeholder="Employer" />
-            <Input placeholder="Location" />
-          </div>
-          <Input placeholder="Salary / stipend" />
-          <textarea
-            rows={6}
-            className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-ink outline-none transition focus:border-navy focus:ring-2 focus:ring-navy/15"
-            placeholder="Description"
-          />
-          <div className="flex justify-end gap-3">
-            <Button variant="secondary" type="button">Cancel</Button>
-            <Button type="submit">Save listing</Button>
-          </div>
-        </form>
-      </Card>
+      <div className="mx-auto w-full max-w-3xl">
+        <ListingForm trades={trades} employers={employers} onSave={handleSave} onAddTrade={handleAddTrade} />
+      </div>
     </div>
   );
 }

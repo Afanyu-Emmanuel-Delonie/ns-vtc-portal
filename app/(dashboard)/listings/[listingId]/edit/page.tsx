@@ -1,9 +1,9 @@
-import { notFound } from "next/navigation";
-import { getListing } from "@/lib/queries/listings";
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { notFound, redirect } from "next/navigation";
 import { BackButton } from "@/components/ui/BackButton";
+import { ListingForm } from "@/components/listings/ListingForm";
+import { getListing, updateListing, getTrades, addTrade } from "@/lib/queries/listings";
+import { getEmployers } from "@/lib/queries/recruiters";
+import type { Listing } from "@/lib/types";
 
 export default async function EditListingPage({
   params,
@@ -11,10 +11,18 @@ export default async function EditListingPage({
   params: Promise<{ listingId: string }>;
 }) {
   const { listingId } = await params;
-  const listing = await getListing(listingId);
+  const [listing, trades, employers] = await Promise.all([getListing(listingId), getTrades(), getEmployers()]);
+  if (!listing) notFound();
 
-  if (!listing) {
-    notFound();
+  async function handleSave(data: Omit<Listing, "id" | "applicants" | "publishedAt">) {
+    "use server";
+    await updateListing(listingId, data);
+    redirect(`/listings/${listingId}`);
+  }
+
+  async function handleAddTrade(trade: string) {
+    "use server";
+    await addTrade(trade);
   }
 
   return (
@@ -22,27 +30,20 @@ export default async function EditListingPage({
       <div>
         <BackButton />
         <div className="mt-4">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate">Edit listing</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate">Listings</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">{listing.title}</h1>
         </div>
       </div>
-      <Card className="max-w-3xl">
-        <form className="grid gap-4">
-          <Input defaultValue={listing.title} />
-          <Input defaultValue={listing.trade} />
-          <Input defaultValue={listing.employer} />
-          <Input defaultValue={listing.location} />
-          <textarea
-            rows={6}
-            className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-ink outline-none transition focus:border-navy focus:ring-2 focus:ring-navy/15"
-            defaultValue={listing.description}
-          />
-          <div className="flex justify-end gap-3">
-            <Button variant="secondary" type="button">Cancel</Button>
-            <Button type="submit">Save changes</Button>
-          </div>
-        </form>
-      </Card>
+      <div className="mx-auto w-full max-w-3xl">
+        <ListingForm
+          initial={listing}
+          listingId={listingId}
+          trades={trades}
+          employers={employers}
+          onSave={handleSave}
+          onAddTrade={handleAddTrade}
+        />
+      </div>
     </div>
   );
 }

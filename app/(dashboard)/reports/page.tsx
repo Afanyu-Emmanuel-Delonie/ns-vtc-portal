@@ -1,12 +1,12 @@
 import { getReportData } from "@/lib/queries/stats";
-import { getRecruiters } from "@/lib/queries/recruiters";
+import { getEmployers } from "@/lib/queries/recruiters";
 import { FunnelChart } from "@/components/dashboard/FunnelChart";
 import { TradeBreakdownTable } from "@/components/dashboard/TradeBreakdownTable";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
 export default async function ReportsPage() {
-  const [report, recruiters] = await Promise.all([getReportData(), getRecruiters()]);
+  const [report, employers] = await Promise.all([getReportData(), getEmployers()]);
 
   const maxApps = Math.max(...report.monthly.map((m) => m.applications), 1);
 
@@ -104,36 +104,34 @@ export default async function ReportsPage() {
         <TradeBreakdownTable rows={report.trades} />
       </div>
 
-      {/* Recruiter performance */}
+      {/* Employer performance */}
       <Card>
         <div className="mb-5 flex items-center justify-between">
-          <h3 className="text-base font-semibold">Recruiter performance</h3>
+          <h3 className="text-base font-semibold">Employer performance</h3>
           <span className="text-sm text-slate">All time</span>
         </div>
         <div className="hidden overflow-hidden rounded-xl border border-border md:block">
           <table className="w-full text-left text-sm">
             <thead className="bg-canvas text-slate">
               <tr>
-                <th className="px-4 py-2.5 font-medium">Recruiter</th>
-                <th className="px-4 py-2.5 font-medium">Role</th>
-                <th className="px-4 py-2.5 font-medium">Active</th>
-                <th className="px-4 py-2.5 font-medium">Placed</th>
-                <th className="px-4 py-2.5 font-medium">Workload</th>
+                <th className="px-4 py-2.5 font-medium">Employer</th>
+                <th className="px-4 py-2.5 font-medium">Industry</th>
+                <th className="px-4 py-2.5 font-medium">Active listings</th>
+                <th className="px-4 py-2.5 font-medium">Placements</th>
                 <th className="px-4 py-2.5 font-medium">Complaints</th>
               </tr>
             </thead>
             <tbody className="bg-surface">
-              {recruiters.map((r) => (
-                <tr key={r.id} className="border-t border-border">
-                  <td className="px-4 py-2.5 font-medium">{r.name}</td>
-                  <td className="px-4 py-2.5 text-slate">{r.role}</td>
-                  <td className="px-4 py-2.5 tabular-nums">{r.activeApplications}</td>
-                  <td className="px-4 py-2.5 tabular-nums">{r.placedCandidates}</td>
-                  <td className="px-4 py-2.5 tabular-nums">{r.workload}</td>
+              {employers.map((e) => (
+                <tr key={e.id} className="border-t border-border">
+                  <td className="px-4 py-2.5 font-medium">{e.name}</td>
+                  <td className="px-4 py-2.5 text-slate">{e.industry}</td>
+                  <td className="px-4 py-2.5 tabular-nums">{e.activeListings}</td>
+                  <td className="px-4 py-2.5 tabular-nums">{e.totalPlacements}</td>
                   <td className="px-4 py-2.5 tabular-nums">
-                    {r.complaints.filter((c) => !c.resolved).length > 0 ? (
+                    {e.complaints.filter((c) => !c.resolved).length > 0 ? (
                       <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-red-500">
-                        {r.complaints.filter((c) => !c.resolved).length} open
+                        {e.complaints.filter((c) => !c.resolved).length} open
                       </span>
                     ) : (
                       <span className="text-slate">—</span>
@@ -146,20 +144,20 @@ export default async function ReportsPage() {
         </div>
         {/* Mobile cards */}
         <div className="grid gap-2 md:hidden">
-          {recruiters.map((r) => (
-            <div key={r.id} className="card flex items-center justify-between gap-3 rounded-xl px-4 py-3">
+          {employers.map((e) => (
+            <div key={e.id} className="card flex items-center justify-between gap-3 rounded-xl px-4 py-3">
               <div>
-                <p className="font-medium">{r.name}</p>
-                <p className="text-xs text-slate">{r.role}</p>
+                <p className="font-medium">{e.name}</p>
+                <p className="text-xs text-slate">{e.industry}</p>
               </div>
               <dl className="flex items-center gap-4 text-right text-xs">
                 <div>
-                  <dt className="text-slate">Active</dt>
-                  <dd className="font-semibold tabular-nums">{r.activeApplications}</dd>
+                  <dt className="text-slate">Listings</dt>
+                  <dd className="font-semibold tabular-nums">{e.activeListings}</dd>
                 </div>
                 <div>
                   <dt className="text-slate">Placed</dt>
-                  <dd className="font-semibold tabular-nums">{r.placedCandidates}</dd>
+                  <dd className="font-semibold tabular-nums">{e.totalPlacements}</dd>
                 </div>
               </dl>
             </div>

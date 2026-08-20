@@ -1,26 +1,26 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Mail, Phone, Briefcase, Users, TrendingUp, Calendar } from "lucide-react";
-import { getRecruiter } from "@/lib/queries/recruiters";
-import { getApplications } from "@/lib/queries/applications";
+import { Mail, Phone, MapPin, Briefcase, TrendingUp, Calendar } from "lucide-react";
+import { getEmployer } from "@/lib/queries/recruiters";
+import { getListings } from "@/lib/queries/listings";
 import { BackButton } from "@/components/ui/BackButton";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { ComplaintsPanel } from "@/components/recruiters/ComplaintsPanel";
 
-export default async function RecruiterDetailPage({
+export default async function EmployerDetailPage({
   params,
 }: {
   params: Promise<{ recruiterId: string }>;
 }) {
   const { recruiterId } = await params;
-  const [recruiter, allApplications] = await Promise.all([
-    getRecruiter(recruiterId),
-    getApplications(),
+  const [employer, allListings] = await Promise.all([
+    getEmployer(recruiterId),
+    getListings(),
   ]);
-  if (!recruiter) notFound();
+  if (!employer) notFound();
 
-  const history = allApplications.filter((a) => a.recruiter === recruiter.name);
+  const listings = allListings.filter((l) => l.employerId === employer.id);
 
   return (
     <div className="grid gap-6">
@@ -29,57 +29,58 @@ export default async function RecruiterDetailPage({
         <BackButton />
         <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate">Recruiter</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight">{recruiter.name}</h1>
-            <p className="mt-1 text-sm text-slate">{recruiter.role}</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate">Employer</p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight">{employer.name}</h1>
+            <p className="mt-1 flex items-center gap-1 text-sm text-slate">
+              <MapPin size={13} />{employer.location}
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 text-sm text-slate">
-            {recruiter.phone && (
-              <a href={`tel:${recruiter.phone}`} className="inline-flex items-center gap-1.5 hover:text-ink">
-                <Phone size={14} />{recruiter.phone}
+            {employer.phone && (
+              <a href={`tel:${employer.phone}`} className="inline-flex items-center gap-1.5 hover:text-ink">
+                <Phone size={14} />{employer.phone}
               </a>
             )}
-            <a href={`mailto:${recruiter.email}`} className="inline-flex items-center gap-1.5 text-navy hover:underline">
-              <Mail size={14} />{recruiter.email}
+            <a href={`mailto:${employer.email}`} className="inline-flex items-center gap-1.5 text-navy hover:underline">
+              <Mail size={14} />{employer.email}
             </a>
           </div>
         </div>
       </div>
 
       {/* Stats strip */}
-      <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard icon={<Briefcase size={18} />} label="Workload" value={recruiter.workload} />
-        <StatCard icon={<Users size={18} />} label="Active applications" value={recruiter.activeApplications} />
-        <StatCard icon={<TrendingUp size={18} />} label="Placed candidates" value={recruiter.placedCandidates} />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <StatCard icon={<Briefcase size={18} />} label="Active listings" value={employer.activeListings} />
+        <StatCard icon={<TrendingUp size={18} />} label="Total placements" value={employer.totalPlacements} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        {/* Application history */}
+        {/* Listings */}
         <Card>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold">Application history</h2>
-            <span className="text-sm text-slate">{history.length} total</span>
+            <h2 className="text-base font-semibold">Listings</h2>
+            <span className="text-sm text-slate">{listings.length} total</span>
           </div>
-          {history.length === 0 ? (
-            <p className="text-sm text-slate">No applications assigned yet.</p>
+          {listings.length === 0 ? (
+            <p className="text-sm text-slate">No listings from this employer yet.</p>
           ) : (
             <div className="grid gap-2">
-              {history.map((app) => (
+              {listings.map((l) => (
                 <Link
-                  key={app.id}
-                  href={`/applications/${app.id}`}
+                  key={l.id}
+                  href={`/listings/${l.id}`}
                   className="flex items-center justify-between rounded-xl border border-border bg-canvas px-4 py-3 transition hover:border-navy/30 hover:bg-navy/5"
                 >
                   <div>
-                    <p className="text-sm font-medium">{app.candidateName}</p>
+                    <p className="text-sm font-medium">{l.title}</p>
                     <p className="mt-0.5 flex items-center gap-1 text-xs text-slate">
                       <Calendar size={11} />
-                      {new Date(app.appliedAt).toLocaleDateString("en-RW", { day: "numeric", month: "short", year: "numeric" })}
+                      {new Date(l.publishedAt).toLocaleDateString("en-RW", { day: "numeric", month: "short", year: "numeric" })}
                       <span className="text-border">·</span>
-                      {app.trade}
+                      {l.trade}
                     </p>
                   </div>
-                  <Badge tone={app.stage === "Hired" ? "success" : "brand"}>{app.stage}</Badge>
+                  <Badge tone={l.status === "Open" ? "success" : l.status === "Paused" ? "warning" : "neutral"}>{l.status}</Badge>
                 </Link>
               ))}
             </div>
@@ -88,7 +89,7 @@ export default async function RecruiterDetailPage({
 
         {/* Complaints */}
         <Card>
-          <ComplaintsPanel recruiterId={recruiter.id} complaints={recruiter.complaints} />
+          <ComplaintsPanel recruiterId={employer.id} complaints={employer.complaints} />
         </Card>
       </div>
     </div>
