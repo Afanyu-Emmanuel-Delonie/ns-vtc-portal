@@ -45,6 +45,7 @@ export interface Application {
   appliedAt: string;
   interviewDate?: string;
   offerDate?: string;
+  hiredAt?: string;
   nextFollowUpDate?: string;
   followUps: FollowUp[];
 }
